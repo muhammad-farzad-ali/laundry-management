@@ -3,7 +3,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from models import init_db, get_db
+from models import init_db, get_db, reset_all_machines
 from config import get_all_machines as config_machines
 
 
@@ -54,9 +54,14 @@ def clean():
     print("Database cleaned")
 
 
+def reset():
+    reset_all_machines()
+    print("All machines reset to default status")
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python cli.py [seed|clean]")
+        print("Usage: python cli.py [seed|clean|reset]")
         sys.exit(1)
 
     command = sys.argv[1]
@@ -64,7 +69,9 @@ if __name__ == "__main__":
         seed()
     elif command == "clean":
         clean()
+    elif command == "reset":
+        reset()
     else:
         print(f"Unknown command: {command}")
-        print("Usage: python cli.py [seed|clean]")
+        print("Usage: python cli.py [seed|clean|reset]")
         sys.exit(1)

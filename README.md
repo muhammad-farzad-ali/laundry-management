@@ -122,9 +122,14 @@ python cli.py seed
 
 # Clean database (removes all machines)
 python cli.py clean
+
+# Reset all machines to default status
+python cli.py reset
 ```
 
 After editing `machines.json`, run `python cli.py seed` to sync changes.
+
+All machines automatically reset to default status (Available, no occupation data) at midnight every day.
 
 ## API Endpoints
 

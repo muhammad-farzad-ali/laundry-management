@@ -1,5 +1,6 @@
 const API_BASE = "/api";
 const POLL_INTERVAL = 30000;
+const MAX_DISTANCE_METERS = 300;
 
 let allMachines = [];
 let dormitories = [];
@@ -7,8 +8,55 @@ let machineTypes = [];
 let currentMachineId = null;
 let countdownIntervals = {};
 let pollTimer = null;
+let userLat = null;
+let userLng = null;
+let dormCoords = {};
+let nearbyDormIds = new Set();
+
+function getDistanceMeters(lat1, lng1, lat2, lng2) {
+    const R = 6371e3;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function requestLocation() {
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            resolve(false);
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                userLat = pos.coords.latitude;
+                userLng = pos.coords.longitude;
+                resolve(true);
+            },
+            () => resolve(false),
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    });
+}
 
 async function init() {
+    const overlay = document.getElementById("location-overlay");
+    const retryBtn = document.getElementById("retry-location");
+
+    const success = await requestLocation();
+
+    if (!success) {
+        overlay.querySelector("p").textContent = "Location access denied.";
+        overlay.querySelector("p + p").textContent = "You can view all machines but editing is only available near a building.";
+        retryBtn.classList.remove("hidden");
+        retryBtn.onclick = () => location.reload();
+        setTimeout(() => { overlay.style.display = "none"; }, 3000);
+    } else {
+        overlay.style.display = "none";
+    }
+
     await loadDormitories();
     await loadMachineTypes();
     await loadMachines();
@@ -20,6 +68,23 @@ async function init() {
 async function loadDormitories() {
     const res = await fetch(`${API_BASE}/dormitories`);
     dormitories = await res.json();
+
+    dormCoords = {};
+    nearbyDormIds.clear();
+    if (userLat !== null && userLng !== null) {
+        dormitories.forEach(d => {
+            if (d.lat != null && d.lng != null) {
+                dormCoords[d.id] = { lat: d.lat, lng: d.lng };
+                const dist = getDistanceMeters(userLat, userLng, d.lat, d.lng);
+                if (dist <= MAX_DISTANCE_METERS) {
+                    nearbyDormIds.add(d.id);
+                }
+            }
+        });
+    } else {
+        dormitories.forEach(d => nearbyDormIds.add(d.id));
+    }
+
     const select = document.getElementById("dormitory-filter");
     dormitories.forEach(d => {
         const opt = document.createElement("option");
@@ -111,14 +176,32 @@ function renderMachines() {
         grouped[m.dormitory_id].machines.push(m);
     });
 
-    container.innerHTML = Object.entries(grouped).map(([dormId, dorm]) => `
+    const sortedEntries = Object.entries(grouped).sort((a, b) => {
+        const aHasCoords = dormCoords[a[0]] != null;
+        const bHasCoords = dormCoords[b[0]] != null;
+        if (aHasCoords && bHasCoords && userLat !== null && userLng !== null) {
+            const distA = getDistanceMeters(userLat, userLng, dormCoords[a[0]].lat, dormCoords[a[0]].lng);
+            const distB = getDistanceMeters(userLat, userLng, dormCoords[b[0]].lat, dormCoords[b[0]].lng);
+            return distA - distB;
+        }
+        if (aHasCoords) return -1;
+        if (bHasCoords) return 1;
+        return 0;
+    });
+
+    container.innerHTML = sortedEntries.map(([dormId, dorm]) => {
+        const isNearby = nearbyDormIds.has(dormId);
+        const subtitle = !isNearby && userLat !== null
+            ? '<span class="text-xs font-normal text-gray-400 ml-2">Outside your area - viewing only</span>'
+            : '';
+        return `
         <div>
-            <h2 class="bg-slate-700 text-white px-4 py-3 font-semibold rounded-t-lg">${dorm.name}</h2>
+            <h2 class="bg-slate-700 text-white px-4 py-3 font-semibold rounded-t-lg flex items-center">${dorm.name}${subtitle}</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-white rounded-b-lg shadow-sm">
                 ${dorm.machines.map(m => renderMachineCard(m)).join("")}
             </div>
         </div>
-    `).join("");
+    `}).join("");
 
     startCountdowns();
 }
@@ -126,6 +209,7 @@ function renderMachines() {
 function renderMachineCard(machine) {
     const status = getStatus(machine);
     const badgeClass = getStatusBadgeClass(status);
+    const isNearby = nearbyDormIds.has(machine.dormitory_id);
 
     let extraInfo = "";
     if (machine.occupied && machine.occupied_until) {
@@ -141,6 +225,11 @@ function renderMachineCard(machine) {
         extraInfo += `<div class="text-xs text-gray-600 mt-1">Permission: ${consentText}</div>`;
     }
 
+    const editClass = isNearby
+        ? "w-full py-2 px-4 border-2 border-blue-500 text-blue-500 rounded font-medium text-sm hover:bg-blue-500 hover:text-white transition-colors min-h-[44px]"
+        : "w-full py-2 px-4 border-2 border-gray-300 text-gray-400 rounded font-medium text-sm cursor-not-allowed min-h-[44px]";
+    const editAttr = isNearby ? `onclick="openModal('${machine.id}')"` : "disabled";
+
     return `
         <div class="border border-gray-200 rounded-lg p-4 flex flex-col">
             <div class="mb-2">
@@ -151,7 +240,7 @@ function renderMachineCard(machine) {
                 <span class="inline-block px-2 py-1 rounded text-xs font-semibold ${badgeClass}">${status}</span>
                 ${extraInfo}
             </div>
-            <button class="w-full py-2 px-4 border-2 border-blue-500 text-blue-500 rounded font-medium text-sm hover:bg-blue-500 hover:text-white transition-colors min-h-[44px]" onclick="openModal('${machine.id}')">Edit</button>
+            <button class="${editClass}" ${editAttr}>Edit</button>
         </div>
     `;
 }

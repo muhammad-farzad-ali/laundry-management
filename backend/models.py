@@ -196,3 +196,20 @@ def expire_machines():
 
     conn.close()
     return expired_ids, expired_machines
+
+
+def reset_all_machines():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE machines SET
+            operational = 1,
+            occupied = 0,
+            occupied_at = NULL,
+            occupied_until = NULL,
+            occupied_by_name = NULL,
+            occupied_by_phone = NULL,
+            consent_to_remove = 0
+    """)
+    conn.commit()
+    conn.close()

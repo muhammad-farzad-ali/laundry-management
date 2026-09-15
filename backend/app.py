@@ -6,12 +6,15 @@ from models import (
     get_machine,
     update_machine,
     expire_machines,
+    reset_all_machines,
 )
 from config import (
     get_dormitories,
     get_machine_types,
 )
 import os
+import threading
+from datetime import datetime, timedelta
 
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 
@@ -19,6 +22,25 @@ app = Flask(__name__)
 CORS(app)
 
 init_db()
+
+
+def schedule_daily_reset():
+    now = datetime.now()
+    tomorrow_midnight = (now + timedelta(days=1)).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    seconds_until_midnight = (tomorrow_midnight - now).total_seconds()
+    timer = threading.Timer(seconds_until_midnight, run_daily_reset)
+    timer.daemon = True
+    timer.start()
+
+
+def run_daily_reset():
+    reset_all_machines()
+    schedule_daily_reset()
+
+
+schedule_daily_reset()
 
 
 @app.route("/")
