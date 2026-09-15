@@ -1,22 +1,131 @@
 {
   "dormitories": [
     {
-      "id": "dorm-a",
-      "name": "Leibnizallee 10/10a/10b",
+      "id": "jacobs",
+      "name": "Jacobs",
       "machine_types": [
         {
           "id": "washer",
           "name": "Washer",
           "machines": [
-            { "id": "dorm-a-washer-1", "name": "Washer 1" },
-            { "id": "dorm-a-washer-2", "name": "Washer 2" },
-            { "id": "dorm-a-washer-3", "name": "Washer 3" }
+            { "id": "jacobs-washer-1", "name": "Washer 1" },
+            { "id": "jacobs-washer-2", "name": "Washer 2" },
+            { "id": "jacobs-washer-3", "name": "Washer 3" },
+            { "id": "jacobs-washer-4", "name": "Washer 4" },
+            { "id": "jacobs-washer-5", "name": "Washer 5" }
           ]
         },
         {
           "id": "dryer",
           "name": "Dryer",
-          "machines": [{ "id": "dorm-a-dryer-1", "name": "Dryer 1" }]
+          "machines": [
+            { "id": "jacobs-dryer-1", "name": "Dryer 1" },
+            { "id": "jacobs-dryer-2", "name": "Dryer 2" },
+            { "id": "jacobs-dryer-3", "name": "Dryer 3" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carl-ferd-4a",
+      "name": "Carl-Ferd 4a",
+      "machine_types": [
+        {
+          "id": "washer",
+          "name": "Washer",
+          "machines": [
+            { "id": "carl-ferd-4a-washer-1", "name": "Washer 1" }
+          ]
+        },
+        {
+          "id": "dryer",
+          "name": "Dryer",
+          "machines": [
+            { "id": "carl-ferd-4a-dryer-1", "name": "Dryer 1" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carl-ferd-4",
+      "name": "Carl-Ferd 4",
+      "machine_types": [
+        {
+          "id": "washer",
+          "name": "Washer",
+          "machines": [
+            { "id": "carl-ferd-4-washer-1", "name": "Washer 1" }
+          ]
+        },
+        {
+          "id": "dryer",
+          "name": "Dryer",
+          "machines": [
+            { "id": "carl-ferd-4-dryer-1", "name": "Dryer 1" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "am-herren",
+      "name": "Am Herren",
+      "machine_types": [
+        {
+          "id": "washer",
+          "name": "Washer",
+          "machines": [
+            { "id": "am-herren-washer-1", "name": "Washer 1" },
+            { "id": "am-herren-washer-2", "name": "Washer 2" }
+          ]
+        },
+        {
+          "id": "dryer",
+          "name": "Dryer",
+          "machines": [
+            { "id": "am-herren-dryer-1", "name": "Dryer 1" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "marketal-48",
+      "name": "Marketal 48",
+      "machine_types": [
+        {
+          "id": "washer",
+          "name": "Washer",
+          "machines": [
+            { "id": "marketal-48-washer-1", "name": "Washer 1" },
+            { "id": "marketal-48-washer-2", "name": "Washer 2" }
+          ]
+        },
+        {
+          "id": "dryer",
+          "name": "Dryer",
+          "machines": [
+            { "id": "marketal-48-dryer-1", "name": "Dryer 1" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "merketal-46",
+      "name": "Merketal 46",
+      "machine_types": [
+        {
+          "id": "washer",
+          "name": "Washer",
+          "machines": [
+            { "id": "merketal-46-washer-1", "name": "Washer 1" },
+            { "id": "merketal-46-washer-2", "name": "Washer 2" }
+          ]
+        },
+        {
+          "id": "dryer",
+          "name": "Dryer",
+          "machines": [
+            { "id": "merketal-46-dryer-1", "name": "Dryer 1" }
+          ]
         }
       ]
     }

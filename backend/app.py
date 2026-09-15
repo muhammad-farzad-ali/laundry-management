@@ -27,6 +27,9 @@ def setup_db():
     seed_db(machines)
 
 
+setup_db()
+
+
 @app.route("/")
 def index():
     response = send_from_directory(FRONTEND_DIR, "index.html")
@@ -130,5 +133,4 @@ def api_expire_machines():
 
 
 if __name__ == "__main__":
-    setup_db()
     app.run(debug=True, host="0.0.0.0", port=5000)
