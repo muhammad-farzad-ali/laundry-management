@@ -13,6 +13,7 @@ async function init() {
     await loadMachineTypes();
     await loadMachines();
     setupFilters();
+    setupModalRadios();
     startPolling();
 }
 
@@ -60,6 +61,37 @@ function setupFilters() {
     document.getElementById("type-filter").addEventListener("change", loadMachines);
 }
 
+function setupModalRadios() {
+    const operationalRadios = document.querySelectorAll('input[name="operational"]');
+    const occupiedRadios = document.querySelectorAll('input[name="occupied"]');
+    const occupiedFields = document.getElementById("occupied-fields");
+
+    operationalRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+            const isNo = radio.value === "no" && radio.checked;
+            const yesRadio = document.getElementById("occupied-yes");
+            const noRadio = document.getElementById("occupied-no");
+            yesRadio.disabled = isNo;
+            noRadio.disabled = isNo;
+            if (isNo) {
+                noRadio.checked = true;
+                yesRadio.checked = false;
+                occupiedFields.classList.add("hidden");
+            }
+        });
+    });
+
+    occupiedRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+            if (radio.value === "yes" && radio.checked) {
+                occupiedFields.classList.remove("hidden");
+            } else if (radio.value === "no" && radio.checked) {
+                occupiedFields.classList.add("hidden");
+            }
+        });
+    });
+}
+
 function renderMachines() {
     const container = document.getElementById("machine-list");
 
@@ -88,8 +120,7 @@ function renderMachines() {
                         <th>Machine</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Operational</th>
-                        <th>Occupied</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,7 +136,6 @@ function renderMachines() {
 function renderMachineRow(machine) {
     const status = getStatus(machine);
     const statusClass = getStatusClass(status);
-    const occupiedDisabled = !machine.operational ? "disabled" : "";
 
     let extraInfo = "";
     if (machine.occupied && machine.occupied_until) {
@@ -126,17 +156,7 @@ function renderMachineRow(machine) {
                 ${extraInfo}
             </td>
             <td>
-                <button class="toggle-btn ${machine.operational ? "active" : ""}"
-                        onclick="toggleOperational('${machine.id}', ${!machine.operational})">
-                    ${machine.operational ? "Yes" : "No"}
-                </button>
-            </td>
-            <td>
-                <button class="toggle-btn ${machine.occupied ? "active" : ""}"
-                        onclick="handleOccupiedClick('${machine.id}', ${machine.occupied})"
-                        ${occupiedDisabled}>
-                    ${machine.occupied ? "Yes" : "No"}
-                </button>
+                <button class="edit-btn" onclick="openModal('${machine.id}')">Edit</button>
             </td>
         </tr>
     `;
@@ -164,25 +184,71 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
-async function toggleOperational(machineId, value) {
-    await updateMachine(machineId, { operational: value });
-}
-
-function handleOccupiedClick(machineId, isOccupied) {
-    if (isOccupied) {
-        updateMachine(machineId, { occupied: false });
-    } else {
-        openModal(machineId);
-    }
-}
-
 function openModal(machineId) {
     currentMachineId = machineId;
-    document.getElementById("timer-hours").value = 1;
-    document.getElementById("timer-minutes").value = 20;
-    document.getElementById("occupant-name").value = "";
-    document.getElementById("occupant-country-code").value = "+49";
-    document.getElementById("occupant-phone").value = "";
+    const machine = allMachines.find(m => m.id === machineId);
+    if (!machine) return;
+
+    document.getElementById("modal-title").textContent = `Update Status: ${machine.name}`;
+
+    const operationalYes = document.querySelector('input[name="operational"][value="yes"]');
+    const operationalNo = document.querySelector('input[name="operational"][value="no"]');
+    const occupiedYes = document.getElementById("occupied-yes");
+    const occupiedNo = document.getElementById("occupied-no");
+    const occupiedFields = document.getElementById("occupied-fields");
+
+    operationalYes.checked = !!machine.operational;
+    operationalNo.checked = !machine.operational;
+
+    const isOperational = !!machine.operational;
+    occupiedYes.disabled = !isOperational;
+    occupiedNo.disabled = !isOperational;
+
+    if (machine.occupied) {
+        occupiedYes.checked = true;
+        occupiedNo.checked = false;
+        occupiedFields.classList.remove("hidden");
+
+        if (machine.occupied_until) {
+            const now = new Date();
+            const until = new Date(machine.occupied_until);
+            const diff = until - now;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            document.getElementById("timer-hours").value = Math.max(0, hours);
+            document.getElementById("timer-minutes").value = Math.max(0, minutes);
+        } else {
+            document.getElementById("timer-hours").value = 1;
+            document.getElementById("timer-minutes").value = 20;
+        }
+
+        document.getElementById("occupant-name").value = machine.occupied_by_name || "";
+        if (machine.occupied_by_phone) {
+            const phone = machine.occupied_by_phone;
+            const codeMatch = phone.match(/^\+\d+/);
+            if (codeMatch) {
+                document.getElementById("occupant-country-code").value = codeMatch[0];
+                document.getElementById("occupant-phone").value = phone.slice(codeMatch[0].length);
+            } else {
+                document.getElementById("occupant-country-code").value = "+49";
+                document.getElementById("occupant-phone").value = phone;
+            }
+        } else {
+            document.getElementById("occupant-country-code").value = "+49";
+            document.getElementById("occupant-phone").value = "";
+        }
+    } else {
+        occupiedNo.checked = true;
+        occupiedYes.checked = false;
+        occupiedFields.classList.add("hidden");
+
+        document.getElementById("timer-hours").value = 1;
+        document.getElementById("timer-minutes").value = 20;
+        document.getElementById("occupant-name").value = "";
+        document.getElementById("occupant-country-code").value = "+49";
+        document.getElementById("occupant-phone").value = "";
+    }
+
     document.getElementById("modal-overlay").style.display = "flex";
 }
 
@@ -191,30 +257,42 @@ function closeModal() {
     document.getElementById("modal-overlay").style.display = "none";
 }
 
-async function confirmOccupied() {
+async function confirmUpdate() {
     if (!currentMachineId) return;
 
-    const hours = parseInt(document.getElementById("timer-hours").value) || 0;
-    const minutes = parseInt(document.getElementById("timer-minutes").value) || 0;
-    const name = document.getElementById("occupant-name").value.trim();
-    const countryCode = document.getElementById("occupant-country-code").value.trim();
-    const phone = document.getElementById("occupant-phone").value.trim();
+    const operationalYes = document.querySelector('input[name="operational"][value="yes"]');
+    const occupiedYes = document.getElementById("occupied-yes");
+    const operational = operationalYes.checked;
+    const occupied = occupiedYes.checked;
 
-    if (hours === 0 && minutes === 0) {
-        alert("Please specify a duration greater than 0.");
+    if (!operational && occupied) {
+        alert("Cannot mark an out-of-order machine as occupied.");
         return;
     }
 
-    const fullPhone = phone ? `${countryCode}${phone}` : "";
+    const data = { operational, occupied };
 
-    await updateMachine(currentMachineId, {
-        occupied: true,
-        occupied_hours: hours,
-        occupied_minutes: minutes,
-        occupied_by_name: name || null,
-        occupied_by_phone: fullPhone || null,
-    });
+    if (occupied) {
+        const hours = parseInt(document.getElementById("timer-hours").value) || 0;
+        const minutes = parseInt(document.getElementById("timer-minutes").value) || 0;
 
+        if (hours === 0 && minutes === 0) {
+            alert("Please specify a duration greater than 0.");
+            return;
+        }
+
+        const name = document.getElementById("occupant-name").value.trim();
+        const countryCode = document.getElementById("occupant-country-code").value.trim();
+        const phone = document.getElementById("occupant-phone").value.trim();
+        const fullPhone = phone ? `${countryCode}${phone}` : "";
+
+        data.occupied_hours = hours;
+        data.occupied_minutes = minutes;
+        data.occupied_by_name = name || null;
+        data.occupied_by_phone = fullPhone || null;
+    }
+
+    await updateMachine(currentMachineId, data);
     closeModal();
 }
 
@@ -244,7 +322,7 @@ function getCountdown(until) {
     const untilDate = new Date(until);
     const diff = untilDate - now;
 
-    if (diff <= 0) return "00:00";
+    if (diff <= 0) return "00:00:00";
 
     const hours = Math.floor(diff / 3600000);
     const minutes = Math.floor((diff % 3600000) / 60000);
