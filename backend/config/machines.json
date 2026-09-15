@@ -1,6 +1,28 @@
 {
   "dormitories": [
     {
+      "id": "leibnizallee",
+      "name": "Leibnizallee",
+      "machine_types": [
+        {
+          "id": "washer",
+          "name": "Washer",
+          "machines": [
+            { "id": "leibnizallee-washer-1", "name": "Washer 1" },
+            { "id": "leibnizallee-washer-2", "name": "Washer 2" },
+            { "id": "leibnizallee-washer-3", "name": "Washer 3" }
+          ]
+        },
+        {
+          "id": "dryer",
+          "name": "Dryer",
+          "machines": [
+            { "id": "leibnizallee-dryer-1", "name": "Dryer 1" }
+          ]
+        }
+      ]
+    },
+    {
       "id": "jacobs",
       "name": "Jacobs",
       "machine_types": [
