@@ -2,70 +2,21 @@
   "dormitories": [
     {
       "id": "dorm-a",
-      "name": "Dormitory A",
+      "name": "Leibnizallee 10/10a/10b",
       "machine_types": [
         {
           "id": "washer",
           "name": "Washer",
           "machines": [
-            {"id": "dorm-a-washer-1", "name": "Washer 1"},
-            {"id": "dorm-a-washer-2", "name": "Washer 2"},
-            {"id": "dorm-a-washer-3", "name": "Washer 3"}
+            { "id": "dorm-a-washer-1", "name": "Washer 1" },
+            { "id": "dorm-a-washer-2", "name": "Washer 2" },
+            { "id": "dorm-a-washer-3", "name": "Washer 3" }
           ]
         },
         {
           "id": "dryer",
           "name": "Dryer",
-          "machines": [
-            {"id": "dorm-a-dryer-1", "name": "Dryer 1"},
-            {"id": "dorm-a-dryer-2", "name": "Dryer 2"}
-          ]
-        }
-      ]
-    },
-    {
-      "id": "dorm-b",
-      "name": "Dormitory B",
-      "machine_types": [
-        {
-          "id": "washer",
-          "name": "Washer",
-          "machines": [
-            {"id": "dorm-b-washer-1", "name": "Washer 1"},
-            {"id": "dorm-b-washer-2", "name": "Washer 2"}
-          ]
-        },
-        {
-          "id": "dryer",
-          "name": "Dryer",
-          "machines": [
-            {"id": "dorm-b-dryer-1", "name": "Dryer 1"}
-          ]
-        }
-      ]
-    },
-    {
-      "id": "dorm-c",
-      "name": "Dormitory C",
-      "machine_types": [
-        {
-          "id": "washer",
-          "name": "Washer",
-          "machines": [
-            {"id": "dorm-c-washer-1", "name": "Washer 1"},
-            {"id": "dorm-c-washer-2", "name": "Washer 2"},
-            {"id": "dorm-c-washer-3", "name": "Washer 3"},
-            {"id": "dorm-c-washer-4", "name": "Washer 4"}
-          ]
-        },
-        {
-          "id": "dryer",
-          "name": "Dryer",
-          "machines": [
-            {"id": "dorm-c-dryer-1", "name": "Dryer 1"},
-            {"id": "dorm-c-dryer-2", "name": "Dryer 2"},
-            {"id": "dorm-c-dryer-3", "name": "Dryer 3"}
-          ]
+          "machines": [{ "id": "dorm-a-dryer-1", "name": "Dryer 1" }]
         }
       ]
     }
