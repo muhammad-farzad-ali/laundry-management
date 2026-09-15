@@ -2,14 +2,12 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from models import (
     init_db,
-    seed_db,
     get_all_machines,
     get_machine,
     update_machine,
     expire_machines,
 )
 from config import (
-    get_all_machines as config_machines,
     get_dormitories,
     get_machine_types,
 )
@@ -20,14 +18,7 @@ FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 app = Flask(__name__)
 CORS(app)
 
-
-def setup_db():
-    init_db()
-    machines = config_machines()
-    seed_db(machines)
-
-
-setup_db()
+init_db()
 
 
 @app.route("/")

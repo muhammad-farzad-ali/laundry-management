@@ -23,6 +23,46 @@
       ]
     },
     {
+      "id": "amallian",
+      "name": "Amallian",
+      "machine_types": [
+        {
+          "id": "washer",
+          "name": "Washer",
+          "machines": [
+            { "id": "amallian-washer-1", "name": "Washer 1" }
+          ]
+        },
+        {
+          "id": "dryer",
+          "name": "Dryer",
+          "machines": [
+            { "id": "amallian-dryer-1", "name": "Dryer 1" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "marienstrasse",
+      "name": "Marienstrasse",
+      "machine_types": [
+        {
+          "id": "washer",
+          "name": "Washer",
+          "machines": [
+            { "id": "marienstrasse-washer-1", "name": "Washer 1" }
+          ]
+        },
+        {
+          "id": "dryer",
+          "name": "Dryer",
+          "machines": [
+            { "id": "marienstrasse-dryer-1", "name": "Dryer 1" }
+          ]
+        }
+      ]
+    },
+    {
       "id": "jacobs",
       "name": "Jacobs",
       "machine_types": [
