@@ -4,88 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laundry Status</title>
-    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <header>
-        <h1>Laundry Status</h1>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-slate-800 text-white p-4 text-center">
+        <h1 class="text-xl font-semibold">Laundry Status</h1>
     </header>
 
-    <main>
-        <div class="filters">
-            <div class="filter-group">
-                <label for="dormitory-filter">Dormitory</label>
-                <select id="dormitory-filter">
+    <main class="p-4 max-w-6xl mx-auto">
+        <div class="flex flex-wrap gap-4 mb-6">
+            <div class="flex-1 min-w-[140px]">
+                <label for="dormitory-filter" class="block text-xs font-semibold text-gray-500 uppercase mb-1">Dormitory</label>
+                <select id="dormitory-filter" class="w-full p-3 text-base border border-gray-300 rounded-md bg-white cursor-pointer min-h-[44px]">
                     <option value="">All Dormitories</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="type-filter">Machine Type</label>
-                <select id="type-filter">
+            <div class="flex-1 min-w-[140px]">
+                <label for="type-filter" class="block text-xs font-semibold text-gray-500 uppercase mb-1">Machine Type</label>
+                <select id="type-filter" class="w-full p-3 text-base border border-gray-300 rounded-md bg-white cursor-pointer min-h-[44px]">
                     <option value="">All Types</option>
                 </select>
             </div>
         </div>
 
-        <div id="machine-list" class="machine-list"></div>
+        <div id="machine-list" class="flex flex-col gap-6"></div>
     </main>
 
-    <div id="modal-overlay" class="modal-overlay" style="display: none;">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 id="modal-title">Update Status</h2>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modal-overlay" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" style="display: none;">
+        <div class="bg-white rounded-lg w-full max-w-md shadow-xl">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h2 id="modal-title" class="text-lg font-semibold">Update Status</h2>
+                <button class="text-gray-500 hover:text-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center text-2xl" onclick="closeModal()">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Operational</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="operational" value="yes"> Yes
+            <div class="p-4">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Operational</label>
+                    <div class="flex gap-6">
+                        <label class="flex items-center gap-2 text-base cursor-pointer min-h-[44px]">
+                            <input type="radio" name="operational" value="yes" class="w-5 h-5 cursor-pointer"> Yes
                         </label>
-                        <label class="radio-label">
-                            <input type="radio" name="operational" value="no"> No
+                        <label class="flex items-center gap-2 text-base cursor-pointer min-h-[44px]">
+                            <input type="radio" name="operational" value="no" class="w-5 h-5 cursor-pointer"> No
                         </label>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Occupied</label>
-                    <div class="radio-group">
-                        <label class="radio-label" id="occupied-yes-label">
-                            <input type="radio" name="occupied" id="occupied-yes" value="yes"> Yes
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Occupied</label>
+                    <div class="flex gap-6">
+                        <label id="occupied-yes-label" class="flex items-center gap-2 text-base cursor-pointer min-h-[44px]">
+                            <input type="radio" name="occupied" id="occupied-yes" value="yes" class="w-5 h-5 cursor-pointer"> Yes
                         </label>
-                        <label class="radio-label" id="occupied-no-label">
-                            <input type="radio" name="occupied" id="occupied-no" value="no"> No
+                        <label id="occupied-no-label" class="flex items-center gap-2 text-base cursor-pointer min-h-[44px]">
+                            <input type="radio" name="occupied" id="occupied-no" value="no" class="w-5 h-5 cursor-pointer"> No
                         </label>
                     </div>
                 </div>
 
                 <div id="occupied-fields" class="hidden">
-                    <div class="form-group">
-                        <label>Duration</label>
-                        <div class="timer-inputs">
-                            <input type="number" id="timer-hours" min="0" max="23" value="1" class="timer-input">
-                            <span>hour(s)</span>
-                            <input type="number" id="timer-minutes" min="0" max="59" value="20" class="timer-input">
-                            <span>min</span>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="timer-hours" min="0" max="23" value="1" class="w-[70px] text-center p-3 text-base border border-gray-300 rounded-md min-h-[44px]">
+                            <span class="text-sm text-gray-600">hour(s)</span>
+                            <input type="number" id="timer-minutes" min="0" max="59" value="20" class="w-[70px] text-center p-3 text-base border border-gray-300 rounded-md min-h-[44px]">
+                            <span class="text-sm text-gray-600">min</span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="occupant-name">Your Name (optional)</label>
-                        <input type="text" id="occupant-name" placeholder="Enter your name" maxlength="100">
+                    <div class="mb-4">
+                        <label for="occupant-name" class="block text-sm font-medium text-gray-700 mb-2">Your Name (optional)</label>
+                        <input type="text" id="occupant-name" placeholder="Enter your name" maxlength="100" class="w-full p-3 text-base border border-gray-300 rounded-md min-h-[44px]">
                     </div>
-                    <div class="form-group">
-                        <label for="occupant-phone">Phone (optional)</label>
-                        <div class="phone-input">
-                            <input type="text" id="occupant-country-code" value="+49" class="country-code">
-                            <input type="tel" id="occupant-phone" placeholder="Phone number" maxlength="20">
+                    <div class="mb-4">
+                        <label for="occupant-phone" class="block text-sm font-medium text-gray-700 mb-2">Phone (optional)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="occupant-country-code" value="+49" class="w-[70px] text-center p-3 text-base border border-gray-300 rounded-md min-h-[44px]">
+                            <input type="tel" id="occupant-phone" placeholder="Phone number" maxlength="20" class="flex-1 p-3 text-base border border-gray-300 rounded-md min-h-[44px]">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Permission to remove laundry</label>
+                        <div class="flex gap-6">
+                            <label class="flex items-center gap-2 text-base cursor-pointer min-h-[44px]">
+                                <input type="radio" name="consent" id="consent-yes" value="yes" class="w-5 h-5 cursor-pointer"> Yes
+                            </label>
+                            <label class="flex items-center gap-2 text-base cursor-pointer min-h-[44px]">
+                                <input type="radio" name="consent" id="consent-no" value="no" class="w-5 h-5 cursor-pointer"> No
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-confirm" onclick="confirmUpdate()">Update</button>
+            <div class="flex justify-end gap-2 p-4 border-t border-gray-200">
+                <button class="px-6 py-3 rounded-md font-medium text-base bg-gray-200 text-gray-700 hover:bg-gray-300 min-h-[44px] border-none" onclick="closeModal()">Cancel</button>
+                <button class="px-6 py-3 rounded-md font-medium text-base bg-blue-500 text-white hover:bg-blue-600 min-h-[44px] border-none" onclick="confirmUpdate()">Update</button>
             </div>
         </div>
     </div>

@@ -27,7 +27,8 @@ def init_db():
             occupied_at TEXT,
             occupied_until TEXT,
             occupied_by_name TEXT,
-            occupied_by_phone TEXT
+            occupied_by_phone TEXT,
+            consent_to_remove BOOLEAN DEFAULT 0
         )
     """)
     cursor.execute("PRAGMA table_info(machines)")
@@ -37,6 +38,7 @@ def init_db():
         "occupied_until": "TEXT",
         "occupied_by_name": "TEXT",
         "occupied_by_phone": "TEXT",
+        "consent_to_remove": "BOOLEAN DEFAULT 0",
     }
     for col, col_type in new_cols.items():
         if col not in existing_cols:
@@ -93,6 +95,7 @@ def update_machine(
     occupied_minutes=None,
     occupied_by_name=None,
     occupied_by_phone=None,
+    consent_to_remove=None,
 ):
     conn = get_db()
     cursor = conn.cursor()
@@ -106,7 +109,8 @@ def update_machine(
             cursor.execute(
                 """UPDATE machines SET occupied = 0,
                    occupied_at = NULL, occupied_until = NULL,
-                   occupied_by_name = NULL, occupied_by_phone = NULL
+                   occupied_by_name = NULL, occupied_by_phone = NULL,
+                   consent_to_remove = 0
                    WHERE id = ?""",
                 (machine_id,),
             )
@@ -118,16 +122,19 @@ def update_machine(
             duration = timedelta(hours=hours, minutes=minutes)
             now = datetime.now()
             until = now + duration
+            consent = 1 if consent_to_remove else 0
             cursor.execute(
                 """UPDATE machines SET occupied = 1,
                    occupied_at = ?, occupied_until = ?,
-                   occupied_by_name = ?, occupied_by_phone = ?
+                   occupied_by_name = ?, occupied_by_phone = ?,
+                   consent_to_remove = ?
                    WHERE id = ?""",
                 (
                     now.isoformat(),
                     until.isoformat(),
                     occupied_by_name,
                     occupied_by_phone,
+                    consent,
                     machine_id,
                 ),
             )
@@ -135,7 +142,8 @@ def update_machine(
             cursor.execute(
                 """UPDATE machines SET occupied = 0,
                    occupied_at = NULL, occupied_until = NULL,
-                   occupied_by_name = NULL, occupied_by_phone = NULL
+                   occupied_by_name = NULL, occupied_by_phone = NULL,
+                   consent_to_remove = 0
                    WHERE id = ?""",
                 (machine_id,),
             )

@@ -96,7 +96,7 @@ function renderMachines() {
     const container = document.getElementById("machine-list");
 
     if (allMachines.length === 0) {
-        container.innerHTML = '<div class="no-machines">No machines found</div>';
+        container.innerHTML = '<div class="text-center py-8 text-gray-500">No machines found</div>';
         return;
     }
 
@@ -112,53 +112,47 @@ function renderMachines() {
     });
 
     container.innerHTML = Object.entries(grouped).map(([dormId, dorm]) => `
-        <div class="dormitory-section">
-            <div class="dormitory-header">${dorm.name}</div>
-            <table class="machine-table">
-                <thead>
-                    <tr>
-                        <th>Machine</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${dorm.machines.map(m => renderMachineRow(m)).join("")}
-                </tbody>
-            </table>
+        <div>
+            <h2 class="bg-slate-700 text-white px-4 py-3 font-semibold rounded-t-lg">${dorm.name}</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-white rounded-b-lg shadow-sm">
+                ${dorm.machines.map(m => renderMachineCard(m)).join("")}
+            </div>
         </div>
     `).join("");
 
     startCountdowns();
 }
 
-function renderMachineRow(machine) {
+function renderMachineCard(machine) {
     const status = getStatus(machine);
-    const statusClass = getStatusClass(status);
+    const badgeClass = getStatusBadgeClass(status);
 
     let extraInfo = "";
     if (machine.occupied && machine.occupied_until) {
         const countdown = getCountdown(machine.occupied_until);
-        extraInfo += `<div class="countdown" data-until="${machine.occupied_until}">⏱ ${countdown}</div>`;
+        extraInfo += `<div class="text-sm font-semibold text-amber-700 mt-1" data-until="${machine.occupied_until}">⏱ ${countdown}</div>`;
     }
     if (machine.occupied && machine.occupied_by_name) {
         const phone = machine.occupied_by_phone ? ` ${machine.occupied_by_phone}` : "";
-        extraInfo += `<div class="occupant-info">${escapeHtml(machine.occupied_by_name)}${escapeHtml(phone)}</div>`;
+        extraInfo += `<div class="text-xs text-gray-500 mt-1 break-all">${escapeHtml(machine.occupied_by_name)}${escapeHtml(phone)}</div>`;
+    }
+    if (machine.occupied) {
+        const consentText = machine.consent_to_remove ? "Yes" : "No";
+        extraInfo += `<div class="text-xs text-gray-600 mt-1">Permission: ${consentText}</div>`;
     }
 
     return `
-        <tr>
-            <td class="machine-name">${escapeHtml(machine.name)}</td>
-            <td>${escapeHtml(machine.machine_type_name)}</td>
-            <td>
-                <span class="status-badge ${statusClass}">${status}</span>
+        <div class="border border-gray-200 rounded-lg p-4 flex flex-col">
+            <div class="mb-2">
+                <h3 class="font-semibold text-base">${escapeHtml(machine.name)}</h3>
+                <p class="text-sm text-gray-500">${escapeHtml(machine.machine_type_name)}</p>
+            </div>
+            <div class="flex-1 mb-3">
+                <span class="inline-block px-2 py-1 rounded text-xs font-semibold ${badgeClass}">${status}</span>
                 ${extraInfo}
-            </td>
-            <td>
-                <button class="edit-btn" onclick="openModal('${machine.id}')">Edit</button>
-            </td>
-        </tr>
+            </div>
+            <button class="w-full py-2 px-4 border-2 border-blue-500 text-blue-500 rounded font-medium text-sm hover:bg-blue-500 hover:text-white transition-colors min-h-[44px]" onclick="openModal('${machine.id}')">Edit</button>
+        </div>
     `;
 }
 
@@ -168,11 +162,11 @@ function getStatus(machine) {
     return "Available";
 }
 
-function getStatusClass(status) {
+function getStatusBadgeClass(status) {
     switch (status) {
-        case "Available": return "status-available";
-        case "Occupied": return "status-occupied";
-        case "Out of Order": return "status-out-of-order";
+        case "Available": return "bg-green-100 text-green-800";
+        case "Occupied": return "bg-amber-100 text-amber-800";
+        case "Out of Order": return "bg-red-100 text-red-800";
         default: return "";
     }
 }
@@ -237,6 +231,9 @@ function openModal(machineId) {
             document.getElementById("occupant-country-code").value = "+49";
             document.getElementById("occupant-phone").value = "";
         }
+
+        document.getElementById("consent-yes").checked = !!machine.consent_to_remove;
+        document.getElementById("consent-no").checked = !machine.consent_to_remove;
     } else {
         occupiedNo.checked = true;
         occupiedYes.checked = false;
@@ -247,6 +244,8 @@ function openModal(machineId) {
         document.getElementById("occupant-name").value = "";
         document.getElementById("occupant-country-code").value = "+49";
         document.getElementById("occupant-phone").value = "";
+        document.getElementById("consent-yes").checked = false;
+        document.getElementById("consent-no").checked = true;
     }
 
     document.getElementById("modal-overlay").style.display = "flex";
@@ -290,6 +289,7 @@ async function confirmUpdate() {
         data.occupied_minutes = minutes;
         data.occupied_by_name = name || null;
         data.occupied_by_phone = fullPhone || null;
+        data.consent_to_remove = document.getElementById("consent-yes").checked;
     }
 
     await updateMachine(currentMachineId, data);
@@ -335,7 +335,7 @@ function startCountdowns() {
     Object.values(countdownIntervals).forEach(clearInterval);
     countdownIntervals = {};
 
-    document.querySelectorAll(".countdown[data-until]").forEach(el => {
+    document.querySelectorAll("[data-until]").forEach(el => {
         const until = el.getAttribute("data-until");
         const interval = setInterval(() => {
             el.textContent = `⏱ ${getCountdown(until)}`;

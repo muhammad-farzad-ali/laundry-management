@@ -99,6 +99,7 @@ def api_update_machine(machine_id):
     occupied_minutes = data.get("occupied_minutes")
     occupied_by_name = data.get("occupied_by_name")
     occupied_by_phone = data.get("occupied_by_phone")
+    consent_to_remove = data.get("consent_to_remove")
 
     if occupied_hours is not None:
         occupied_hours = int(occupied_hours)
@@ -113,6 +114,7 @@ def api_update_machine(machine_id):
         occupied_minutes=occupied_minutes,
         occupied_by_name=occupied_by_name,
         occupied_by_phone=occupied_by_phone,
+        consent_to_remove=consent_to_remove,
     )
     return jsonify(updated)
 
