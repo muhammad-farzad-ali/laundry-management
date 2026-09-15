@@ -29,12 +29,16 @@ def setup_db():
 
 @app.route("/")
 def index():
-    return send_from_directory(FRONTEND_DIR, "index.html")
+    response = send_from_directory(FRONTEND_DIR, "index.html")
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
 
 
 @app.route("/<path:path>")
 def serve_static(path):
-    return send_from_directory(FRONTEND_DIR, path)
+    response = send_from_directory(FRONTEND_DIR, path)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
 
 
 @app.route("/api/dormitories", methods=["GET"])

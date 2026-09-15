@@ -50,11 +50,18 @@ def init_db():
 def seed_db(machines):
     conn = get_db()
     cursor = conn.cursor()
+    valid_ids = [m["id"] for m in machines]
     for m in machines:
         cursor.execute(
             """
-            INSERT OR IGNORE INTO machines (id, dormitory_id, dormitory_name, machine_type, machine_type_name, name)
+            INSERT INTO machines (id, dormitory_id, dormitory_name, machine_type, machine_type_name, name)
             VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+                dormitory_id = excluded.dormitory_id,
+                dormitory_name = excluded.dormitory_name,
+                machine_type = excluded.machine_type,
+                machine_type_name = excluded.machine_type_name,
+                name = excluded.name
         """,
             (
                 m["id"],
@@ -64,6 +71,11 @@ def seed_db(machines):
                 m["machine_type_name"],
                 m["name"],
             ),
+        )
+    if valid_ids:
+        placeholders = ",".join("?" * len(valid_ids))
+        cursor.execute(
+            f"DELETE FROM machines WHERE id NOT IN ({placeholders})", valid_ids
         )
     conn.commit()
     conn.close()
