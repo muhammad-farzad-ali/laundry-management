@@ -376,6 +376,10 @@ async function confirmUpdate() {
         }
 
         const name = document.getElementById("occupant-name").value.trim();
+        if (!name) {
+            alert("Please enter your name.");
+            return;
+        }
         const countryCode = document.getElementById("occupant-country-code").value.trim();
         const phone = document.getElementById("occupant-phone").value.trim();
         const fullPhone = phone ? `${countryCode}${phone}` : "";

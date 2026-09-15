@@ -126,6 +126,9 @@ def api_update_machine(machine_id):
     if occupied_minutes is not None:
         occupied_minutes = int(occupied_minutes)
 
+    if occupied is True and not occupied_by_name:
+        return jsonify({"error": "Name is required to occupy a machine"}), 400
+
     updated = update_machine(
         machine_id,
         operational=operational,
