@@ -11,7 +11,10 @@ def load_config():
 
 def get_dormitories():
     config = load_config()
-    return [{"id": d["id"], "name": d["name"]} for d in config["dormitories"]]
+    return [
+        {"id": d["id"], "name": d["name"], "lat": d.get("lat"), "lng": d.get("lng")}
+        for d in config["dormitories"]
+    ]
 
 
 def get_machine_types():

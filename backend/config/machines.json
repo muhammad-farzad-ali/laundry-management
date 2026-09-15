@@ -3,6 +3,8 @@
     {
       "id": "leibnizallee",
       "name": "Leibnizallee",
+      "lat": 50.9793639,
+      "lng": 11.3367102,
       "machine_types": [
         {
           "id": "washer",
@@ -25,6 +27,8 @@
     {
       "id": "amallian",
       "name": "Amallian",
+      "lat": 50.9791589,
+      "lng": 11.3168997,
       "machine_types": [
         {
           "id": "washer",
@@ -45,6 +49,8 @@
     {
       "id": "marienstrasse",
       "name": "Marienstrasse",
+      "lat": 50.97627949108666,
+      "lng": 11.328447832708614,
       "machine_types": [
         {
           "id": "washer",
@@ -65,6 +71,8 @@
     {
       "id": "jacobs",
       "name": "Jacobs",
+      "lat": 50.9848761,
+      "lng": 11.3258056,
       "machine_types": [
         {
           "id": "washer",
@@ -91,6 +99,8 @@
     {
       "id": "carl-ferd-4a",
       "name": "Carl-Ferd 4a",
+      "lat": 50.9780363,
+      "lng": 11.3302053,
       "machine_types": [
         {
           "id": "washer",
@@ -111,6 +121,8 @@
     {
       "id": "carl-ferd-4",
       "name": "Carl-Ferd 4",
+      "lat": 50.9780363,
+      "lng": 11.3302053,
       "machine_types": [
         {
           "id": "washer",
@@ -131,6 +143,8 @@
     {
       "id": "am-herren",
       "name": "Am Herren",
+      "lat": 51.0033936,
+      "lng": 11.3100031,
       "machine_types": [
         {
           "id": "washer",
@@ -152,6 +166,8 @@
     {
       "id": "marketal-48",
       "name": "Marketal 48",
+      "lat": 50.963978,
+      "lng": 11.3219247,
       "machine_types": [
         {
           "id": "washer",
@@ -173,6 +189,8 @@
     {
       "id": "merketal-46",
       "name": "Merketal 46",
+      "lat": 50.963978,
+      "lng": 11.3219247,
       "machine_types": [
         {
           "id": "washer",
