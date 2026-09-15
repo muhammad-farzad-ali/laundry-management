@@ -7,6 +7,7 @@ A mobile-first web application for viewing and updating shared laundry machine s
 ```bash
 cd backend
 pip install -r requirements.txt
+python cli.py seed
 python app.py
 ```
 
@@ -95,6 +96,7 @@ laundry-management/
 │   ├── app.py              # Flask application & REST API
 │   ├── models.py           # SQLite database models
 │   ├── config.py           # Configuration loader
+│   ├── cli.py              # Database seed/clean CLI
 │   ├── config/
 │   │   └── machines.json   # Machine configuration
 │   └── requirements.txt
@@ -106,7 +108,23 @@ laundry-management/
 
 ## Configuration
 
-Edit `backend/config/machines.json` to add/remove dormitories, machine types, or machines. Restart the server after changes.
+Edit `backend/config/machines.json` to add/remove dormitories, machine types, or machines.
+
+## Database CLI
+
+The server does not auto-seed the database. Use the CLI to manage it:
+
+```bash
+cd backend
+
+# Seed database from machines.json (creates/updates machines)
+python cli.py seed
+
+# Clean database (removes all machines)
+python cli.py clean
+```
+
+After editing `machines.json`, run `python cli.py seed` to sync changes.
 
 ## API Endpoints
 
@@ -125,4 +143,15 @@ Edit `backend/config/machines.json` to add/remove dormitories, machine types, or
 - **Operational + Occupied** = Occupied (yellow)
 - **Not Operational** = Out of Order (red, occupied forced to No)
 
-When a machine is occupied, a timer counts down and automatically resets to Available when expired.
+When a machine is occupied, a timer counts down (max 2 hours) and automatically resets to Available when expired.
+
+## Machine Status Fields
+
+| Field | Description |
+|-------|-------------|
+| Operational | Whether the machine is working (Yes/No) |
+| Occupied | Whether someone is using it (Yes/No) |
+| Duration | How long the machine is occupied (max 2 hours) |
+| Occupant Name | Optional name of the person using the machine |
+| Occupant Phone | Optional phone number with country code |
+| Permission to Remove | Whether others can remove laundry when timer expires |

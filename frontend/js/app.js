@@ -280,6 +280,12 @@ async function confirmUpdate() {
             return;
         }
 
+        const totalMinutes = (hours * 60) + minutes;
+        if (totalMinutes > 120) {
+            alert("Duration cannot exceed 2 hours.");
+            return;
+        }
+
         const name = document.getElementById("occupant-name").value.trim();
         const countryCode = document.getElementById("occupant-country-code").value.trim();
         const phone = document.getElementById("occupant-phone").value.trim();
