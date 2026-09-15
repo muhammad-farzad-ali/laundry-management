@@ -49,13 +49,13 @@ async function init() {
 
     if (!success) {
         overlay.querySelector("p").textContent = "Location access denied.";
-        overlay.querySelector("p + p").textContent = "You can view all machines but editing is only available near a building.";
+        overlay.querySelector("p + p").textContent = "Please enable location to use this app.";
         retryBtn.classList.remove("hidden");
         retryBtn.onclick = () => location.reload();
-        setTimeout(() => { overlay.style.display = "none"; }, 3000);
-    } else {
-        overlay.style.display = "none";
+        return;
     }
+
+    overlay.style.display = "none";
 
     await loadDormitories();
     await loadMachineTypes();
